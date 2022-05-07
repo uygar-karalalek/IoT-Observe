@@ -63,7 +63,7 @@
                                             }
                                         </script>
                                         <h5 class="card-title">Device {{$devices[$i]->name}}</h5>
-                                        <a class="btn btn-primary" onclick="{{ "editDeviceFun" . $i }}()">Edit
+                                        <a class="btn btn-primary" onclick="{{ "editDeviceNum" . $i }}()">Edit
                                             the device</a>
                                     </div>
                                 </div>
