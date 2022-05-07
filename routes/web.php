@@ -5,7 +5,6 @@ use App\Http\Controllers\IndexController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -16,10 +15,10 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-Route::get('/', [IndexController::class, "index"]);
-Route::get('/devices', [DeviceController::class, "getAllDevices"]);
-
 Auth::routes();
 
+Route::get('/', [IndexController::class, "index"]);
+Route::get('/device', [DeviceController::class, "getAllDevices"]);
+Route::post('/device/create', [DeviceController::class, "addDevice"]);
+Route::post('/device/edit', [DeviceController::class, "editDevice"]);
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
