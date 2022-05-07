@@ -8,7 +8,7 @@ use Throwable;
 class Handler extends ExceptionHandler
 {
     /**
-     * A list of the exception types that are not reported.
+     * A list of the exception Types that are not reported.
      *
      * @var array<int, class-string<Throwable>>
      */

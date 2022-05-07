@@ -30,8 +30,8 @@ class DeviceController extends Controller
     {
         $deviceUuid = $request->input("device_uuid");
         if ($deviceUuid) {
-            $device = Device::query()->where('uuid', '=', $deviceUuid)->get()[0];
-            return view("layouts.device.edit")->with("device", $device);
+            $device = Device::query()->where('uuid', '=', $deviceUuid)->first();
+            return view("layouts.device.edit")->with("device", $device)->with("deviceTypes",  function () {return getAllTypes();});
         }
     }
 

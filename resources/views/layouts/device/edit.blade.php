@@ -11,12 +11,18 @@
                             @csrf
                             <table>
                                 <tr>
-                                    <td>Name: </td>
+                                    <td>Name:</td>
                                     <td><input type="text" value="Name"></td>
                                 </tr>
                                 <tr>
-                                    <td>: </td>
-                                    <td><input type="text" value="Name"></td>
+                                    <td>Device type:</td>
+                                    <td><select value="Name">
+                                            {{ $types = $deviceTypes() }}
+                                            @foreach($types as $item)
+                                                {{$item}}
+                                            @endforeach
+                                            <option value=""></option>
+                                        </select></td>
                                 </tr>
                             </table>
                         </form>

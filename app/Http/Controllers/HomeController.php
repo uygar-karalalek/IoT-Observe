@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Device;
-use Illuminate\Http\Request;
+use App\Types;
 
 class HomeController extends Controller
 {
@@ -25,6 +25,7 @@ class HomeController extends Controller
     public function index()
     {
         $devices = Device::all();
-        return view('home')->with("device", $devices);
+        return view('home')->with("device", $devices)
+            ->with("deviceTypes", Types::getAllTypes());
     }
 }
