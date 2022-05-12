@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Device;
+use App\Models\Sensor;
+use App\Types\Types;
 use Faker\Core\Uuid;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class DeviceController extends Controller
 {
@@ -31,8 +34,13 @@ class DeviceController extends Controller
         $deviceUuid = $request->input("device_uuid");
         if ($deviceUuid) {
             $device = Device::query()->where('uuid', '=', $deviceUuid)->first();
-            return view("layouts.device.edit")->with("device", $device)->with("deviceTypes",  function () {return getAllTypes();});
+
+            $relatedSensors = DB::table("sensor")->where("device_uuid", "=", $deviceUuid)->get();
+            return view("layouts.device.edit")->with("device", $device)
+                ->with("deviceTypes", Types::SENSOR_TYPES())
+                ->with("relatedSensors", $relatedSensors);
         }
+
     }
 
     public function getAllDevices()

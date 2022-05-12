@@ -16,13 +16,13 @@
                                 </tr>
                                 <tr>
                                     <td>Device type:</td>
-                                    <td><select value="Name">
-                                            {{ $types = $deviceTypes() }}
-                                            @foreach($types as $item)
-                                                {{$item}}
-                                            @endforeach
-                                            <option value=""></option>
-                                        </select></td>
+                                    <td><label>{{$device->type}}</label></td>
+                                </tr>
+                                <tr>
+                                    <td><h3 style="padding-top: 40px">Sensors</h3></td>
+                                </tr>
+                                <tr>
+                                    <td>@include('layouts.device.edit_sensor')</td>
                                 </tr>
                             </table>
                         </form>

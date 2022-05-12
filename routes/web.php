@@ -19,6 +19,6 @@ Auth::routes();
 
 Route::get('/', [IndexController::class, "index"]);
 Route::get('/device', [DeviceController::class, "getAllDevices"]);
-Route::post('/device/create', [DeviceController::class, "addDevice"]);
+Route::post('/devices/create', [DeviceController::class, "addDevice"]);
 Route::post('/device/edit', [DeviceController::class, "editDevice"]);
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
