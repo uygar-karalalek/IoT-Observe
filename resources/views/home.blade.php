@@ -56,6 +56,7 @@
                                         <form method="post" action="/device/edit" name="edit_device[{{$i}}]">
                                             @csrf
                                             <input type="hidden" value="{{$devices[$i]->uuid}}" name="device_uuid">
+                                            <input type="hidden" name="request_type" value="goToAddSensorPage">
                                         </form>
                                         <script>
                                             function editDeviceNum{{$i}}() {
@@ -63,8 +64,9 @@
                                             }
                                         </script>
                                         <h5 class="card-title">Device {{$devices[$i]->name}}</h5>
-                                        <a class="btn btn-primary" onclick="{{ "editDeviceNum" . $i }}()">Edit
-                                            the device</a>
+                                        <a class="btn btn-primary" onclick="{{ "editDeviceNum" . $i }}()">
+                                            Edit the device
+                                        </a>
                                     </div>
                                 </div>
                             </div>

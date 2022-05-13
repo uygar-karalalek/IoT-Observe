@@ -4,7 +4,7 @@
 namespace App\Types;
 
 
-class Type
+class Type implements \JsonSerializable
 {
 
     /**
@@ -43,4 +43,11 @@ class Type
         return $this->unit;
     }
 
+    public function jsonSerialize(): array
+    {
+        $data = [];
+        $data["key"] = $this->key;
+        $data["unit"] = $this->unit;
+        return $data;
+    }
 }
