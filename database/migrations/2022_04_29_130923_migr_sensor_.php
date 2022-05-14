@@ -17,7 +17,6 @@ return new class extends Migration
     {
         Schema::create('sensor', function (Blueprint $table) {
             $table->id();
-            $table->string('value');
             $table->enum('type', self::SENSOR_TYPES);
             $table->string('device_uuid');
             $table->foreign('device_uuid')->references('uuid')->on('device');

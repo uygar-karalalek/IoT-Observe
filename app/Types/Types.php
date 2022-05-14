@@ -10,7 +10,6 @@ class Types
     public static string $PC_TYPE = 'PC';
 
     public static ?Type $light = null;
-    public static ?Type $accelerometer = null;
     public static ?Type $CO2 = null;
     public static ?Type $humidity = null;
 
@@ -27,11 +26,9 @@ class Types
 
             $types[self::$PHONE_TYPE] = [
                 self::$light,
-                self::$accelerometer
             ];
             $types[self::$ARDUINO_TYPE] = [
                 self::$light,
-                self::$accelerometer,
                 self::$CO2,
                 self::$humidity
             ];
@@ -58,7 +55,6 @@ class Types
 
         return [
             self::$light->getKey() => self::$light,
-            self::$accelerometer->getKey() => self::$accelerometer,
             self::$CO2->getKey() => self::$CO2,
             self::$humidity->getKey() => self::$humidity
         ];
@@ -70,7 +66,6 @@ class Types
 
         return [
             self::$light,
-            self::$accelerometer,
             self::$CO2,
             self::$humidity
         ];
@@ -82,7 +77,6 @@ class Types
     {
         if (!self::$initialized) {
             self::$light = self::$light == null ? new Type("light", "lux") : self::$light;
-            self::$accelerometer = self::$accelerometer == null ? new Type("accelerometer", "m/s2") : self::$accelerometer;
             self::$CO2 = self::$CO2 == null ? new Type("CO2", "ppm") : self::$CO2;
             self::$humidity = self::$humidity == null ? new Type("humidity", "g/m3") : self::$humidity;
 

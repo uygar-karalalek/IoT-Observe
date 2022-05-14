@@ -5,6 +5,7 @@ namespace App\FormCycle;
 
 
 use App\Models\Sensor;
+use JetBrains\PhpStorm\Pure;
 
 class DeviceSensorEditForm
 {
@@ -18,8 +19,6 @@ class DeviceSensorEditForm
 
     private string $device_uuid;
 
-    private bool $toSave;
-
     /**
      * @var DeviceSensorPropertiesEditForm
      */
@@ -30,15 +29,13 @@ class DeviceSensorEditForm
      * @param int $sensorId
      * @param string $type
      * @param string $device_uuid
-     * @param bool $toSave
      */
-    public function __construct(int $sensorId, string $type, string $device_uuid, bool $toSave = false)
+    #[Pure] public function __construct(int $sensorId, string $type, string $device_uuid)
     {
         $this->id = $sensorId;
         $this->type = $type;
         $this->device_uuid = $device_uuid;
         $this->props = new DeviceSensorPropertiesEditForm();
-        $this->toSave = $toSave;
     }
 
     /**
@@ -66,14 +63,6 @@ class DeviceSensorEditForm
     }
 
     /**
-     * @return bool
-     */
-    public function isToSave(): bool
-    {
-        return $this->toSave;
-    }
-
-    /**
      * @param int $id
      */
     public function setId(int $id): void
@@ -97,8 +86,8 @@ class DeviceSensorEditForm
         $this->props = $props;
     }
 
-    public static function fromSensorModel(Sensor $sensor, bool $toSave): DeviceSensorEditForm {
-        return new DeviceSensorEditForm($sensor->id, $sensor->type, $sensor->device_uuid, $toSave);
+    public static function fromSensorModel(Sensor $sensor): DeviceSensorEditForm {
+        return new DeviceSensorEditForm($sensor->id, $sensor->type, $sensor->device_uuid);
     }
 
 }
