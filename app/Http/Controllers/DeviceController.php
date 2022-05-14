@@ -3,15 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\FormCycle\DeviceSensorEditForm;
+use App\FormCycle\DeviceSensorPropertiesEditForm;
 use App\FormCycle\DeviceSensorEditFormCycle;
 use App\Models\Device;
+use App\Models\Sensor;
+use App\Types\Operators;
 use App\Types\Types;
 use Faker\Core\Uuid;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -19,7 +24,7 @@ use Illuminate\Support\Facades\DB;
 class DeviceController extends Controller
 {
 
-    public function addDevice(Request $request)
+    public function addDevice(Request $request): Redirector|Application|RedirectResponse
     {
         $devName = $request->input("deviceName");
         $type = $request->input("deviceType");
@@ -40,13 +45,17 @@ class DeviceController extends Controller
         $deviceUuid = $request->input("device_uuid");
         $requestType = $request->input("request_type");
         if ($deviceUuid) {
-            if($requestType == "goToAddSensorPage") {
-                return $this->goToAddSensorPage($deviceUuid, $request);
+
+            if($requestType == "editDevice") {
+                return $this->editDevicePage($deviceUuid, $request);
             }
-            else if ($requestType == "saveSensor") {
+            else if ($requestType == "addSensor") {
+                return $this->toAddSensor($deviceUuid, $request);
+            }
+            if ($requestType == "saveSensorProperty") {
                 $deviceSensorEditFormCycle = $this->getDeviceSensorEditFormCycleSessionObject($request);
-                $deviceSensorEditFormCycle->setEditingActive(false);
-                return "Ciao";
+                //$deviceSensorEditFormCycle->getSensors()
+                return "X";
             }
         }
 
@@ -63,32 +72,38 @@ class DeviceController extends Controller
      * @param Request $request
      * @return Application|Factory|View
      */
-    private function goToAddSensorPage(mixed $deviceUuid, Request $request): Application|Factory|View
+    private function editDevicePage(mixed $deviceUuid, Request $request): Application|Factory|View
     {
-        $editing = boolval($request->input("editing"));
-
         $deviceSensorEditFormCycle = $this->getDeviceSensorEditFormCycleSessionObject($request);
 
         if (!$deviceSensorEditFormCycle)
-            $deviceSensorEditFormCycle = new DeviceSensorEditFormCycle(false, new DeviceSensorEditForm());
-        else if ($editing)
-            $deviceSensorEditFormCycle->setEditingActive(true);
+            $deviceSensorEditFormCycle = new DeviceSensorEditFormCycle();
+
+
+        $sensors = $this->getSensorsWhereDeviceUuidEquals($deviceUuid);
+        foreach ($sensors as $sensor) $deviceSensorEditFormCycle->getSensors()[] = $sensor;
+
+        $device = $this->getDeviceWhereUuidEquals($deviceUuid);
 
         $request->session()->put('deviceSensorEditFormCycle', $deviceSensorEditFormCycle);
 
-        return view("layouts.device.edit")
-            ->with("device", $this->getDeviceWhereUuidEquals($deviceUuid))
-            ->with("sensors", Types::SENSORS())
-            ->with("sensorTypes", Types::SENSOR_TYPES())
-            ->with("relatedSensors", $this->getSensorWhereDeviceUuidEquals($deviceUuid))
-            ->with("deviceSensorEditFormCycle", $deviceSensorEditFormCycle);
+        return $this->editView($deviceSensorEditFormCycle)
+            ->with("device", $device);
+    }
+
+    public function getNewSensor(int $newId, string $deviceUuid): Sensor {
+        $newSensor = new Sensor();
+        $newSensor->id = $newId;
+        $newSensor->type = Types::SENSOR_TYPES()[1]->getUnit();
+        $newSensor->device_uuid = $deviceUuid;
+        return $newSensor;
     }
 
     /**
      * @param mixed $deviceUuid
      * @return Collection
      */
-    private function getSensorWhereDeviceUuidEquals(mixed $deviceUuid): Collection
+    private function getSensorsWhereDeviceUuidEquals(mixed $deviceUuid): Collection
     {
         return DB::table("sensor")->where("device_uuid", "=", $deviceUuid)->get();
     }
@@ -109,6 +124,52 @@ class DeviceController extends Controller
     private function getDeviceSensorEditFormCycleSessionObject(Request $request): null|DeviceSensorEditFormCycle
     {
         return $request->session()->get("deviceSensorEditFormCycle");
+    }
+
+    /**
+     * @param DeviceSensorEditFormCycle $deviceSensorEditFormCycle
+     * @return Application|Factory|View
+     */
+    private function editView(DeviceSensorEditFormCycle $deviceSensorEditFormCycle): Application|Factory|View
+    {
+        return view("layouts.device.edit")
+            ->with("sensorKeyAndTypes", Types::SENSOR_KEY_AND_TYPES())
+            ->with("sensorTypes", Types::SENSOR_TYPES())
+            ->with("deviceSensorEditFormCycle", $deviceSensorEditFormCycle);
+    }
+
+    /**
+     * @param mixed $deviceUuid
+     * @return int
+     */
+    private function getNextSensorId(mixed $deviceUuid): int
+    {
+        $max = DB::table("sensor")->select()->where("device_uuid", "=", $deviceUuid)->max("id");
+        return 1 + ($max ?? 0);
+    }
+
+    /**
+     * @param mixed $deviceUuid
+     * @param Request $request
+     * @return View
+     */
+    private function toAddSensor(mixed $deviceUuid, Request $request): string|View
+    {
+        $sensors = $this->getSensorsWhereDeviceUuidEquals($deviceUuid);
+        $deviceSensorEditFormCycle = $this->getDeviceSensorEditFormCycleSessionObject($request);
+
+        foreach ($sensors as $sensor) $deviceSensorEditFormCycle->getSensors()[] = $sensor;
+
+        $nextSensorId = $this->getNextSensorId($deviceUuid);
+        $newSensor = $this->getNewSensor($nextSensorId, $deviceUuid);
+
+
+        $deviceSensorEditFormCycle->addSensor(DeviceSensorEditForm::fromSensorModel($newSensor));
+        $deviceSensorEditFormCycle->setEditingSensor(DeviceSensorEditForm::fromSensorModel($newSensor));
+
+        return $this->editView($deviceSensorEditFormCycle)
+            ->with("device", $this->getDeviceWhereUuidEquals($deviceUuid))
+            ->with("operators", Operators::OPERATORS());
     }
 
 }

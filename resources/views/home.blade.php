@@ -56,7 +56,7 @@
                                         <form method="post" action="/device/edit" name="edit_device[{{$i}}]">
                                             @csrf
                                             <input type="hidden" value="{{$devices[$i]->uuid}}" name="device_uuid">
-                                            <input type="hidden" name="request_type" value="goToAddSensorPage">
+                                            <input type="hidden" name="request_type" value="editDevice">
                                         </form>
                                         <script>
                                             function editDeviceNum{{$i}}() {

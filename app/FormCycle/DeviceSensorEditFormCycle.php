@@ -8,48 +8,49 @@ class DeviceSensorEditFormCycle
 {
 
     /**
-     * @var bool
+     * @var DeviceSensorEditForm|null
      */
-    private $editingActive;
+    private ?DeviceSensorEditForm $editingSensor;
 
     /**
      * @var DeviceSensorEditForm[]
      */
-    private $sensors;
+    private array|DeviceSensorEditForm $sensors = [];
 
     /**
      * DeviceSensorEditFormCycle constructor.
-     * @param bool $editingIsActive
-     * @param DeviceSensorEditForm $editingFields
      */
-    public function __construct(bool $editingIsActive, DeviceSensorEditForm $editingFields)
+    public function __construct()
     {
-        $this->editingActive = $editingIsActive;
-        $this->sensors = $editingFields;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isEditingActive(): bool
-    {
-        return $this->editingActive;
-    }
-
-    /**
-     * @param bool $editingActive
-     */
-    public function setEditingActive(bool $editingActive): void
-    {
-        $this->editingActive = $editingActive;
-    }
+        $this->editingSensor = null;
+     }
 
     /**
      * @return DeviceSensorEditForm
      */
-    public function getSensors(): DeviceSensorEditForm
+    public function getEditingSensor(): DeviceSensorEditForm
+    {
+        return $this->editingSensor;
+    }
+
+    /**
+     * @param DeviceSensorEditForm $editingSensor
+     */
+    public function setEditingSensor(DeviceSensorEditForm $editingSensor): void
+    {
+        $this->editingSensor = $editingSensor;
+    }
+
+    /**
+     * @return DeviceSensorEditForm[]
+     */
+    public function getSensors(): array
     {
         return $this->sensors;
+    }
+
+    public function addSensor(DeviceSensorEditForm $sensorEditForm): void {
+        $this->sensors[] = $sensorEditForm;
     }
 
     /**
@@ -58,6 +59,10 @@ class DeviceSensorEditFormCycle
     public function setSensors(DeviceSensorEditForm $sensors): void
     {
         $this->sensors = $sensors;
+    }
+
+    public function isEditingActive(): bool {
+        return $this->editingSensor != null;
     }
 
 }

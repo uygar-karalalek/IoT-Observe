@@ -53,7 +53,7 @@ class Types
         return $types;
     }
 
-    static function SENSORS(): array {
+    static function SENSOR_KEY_AND_TYPES(): array {
         self::init();
 
         return [
@@ -82,7 +82,7 @@ class Types
     {
         if (!self::$initialized) {
             self::$light = self::$light == null ? new Type("light", "lux") : self::$light;
-            self::$accelerometer = self::$accelerometer == null ? new Type("accelerometer", "m/s^2") : self::$accelerometer;
+            self::$accelerometer = self::$accelerometer == null ? new Type("accelerometer", "m/s2") : self::$accelerometer;
             self::$CO2 = self::$CO2 == null ? new Type("CO2", "ppm") : self::$CO2;
             self::$humidity = self::$humidity == null ? new Type("humidity", "g/m3") : self::$humidity;
 
