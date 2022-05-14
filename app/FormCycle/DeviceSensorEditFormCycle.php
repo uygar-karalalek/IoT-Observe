@@ -4,6 +4,8 @@
 namespace App\FormCycle;
 
 
+use Illuminate\Support\Facades\DB;
+
 class DeviceSensorEditFormCycle
 {
 
@@ -63,6 +65,9 @@ class DeviceSensorEditFormCycle
 
     public function isEditingActive(): bool {
         return $this->editingSensor != null;
+    }
+
+    public function saveEditingSensor() {
     }
 
 }

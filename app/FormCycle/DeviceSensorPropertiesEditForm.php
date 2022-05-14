@@ -8,18 +8,20 @@ class DeviceSensorPropertiesEditForm
 {
 
     /**
-     * @var array
+     * @var DeviceSensorProperty[]|array
      */
-    public $firstValues = [];
+    private array $properties = [];
+
+    public function add(DeviceSensorProperty $deviceSensorProperty) {
+        $this->properties[] = $deviceSensorProperty;
+    }
 
     /**
-     * @var array
+     * @return array
      */
-    public $operators = [];
-
-    /**
-     * @var array
-     */
-    public $secondValues = [];
+    public function getProperties(): array
+    {
+        return $this->properties;
+    }
 
 }

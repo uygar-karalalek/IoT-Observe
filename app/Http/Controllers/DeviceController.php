@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\FormCycle\DeviceSensorEditForm;
 use App\FormCycle\DeviceSensorPropertiesEditForm;
 use App\FormCycle\DeviceSensorEditFormCycle;
+use App\FormCycle\DeviceSensorProperty;
 use App\Models\Device;
 use App\Models\Sensor;
 use App\Types\Operators;
@@ -46,16 +47,23 @@ class DeviceController extends Controller
         $requestType = $request->input("request_type");
         if ($deviceUuid) {
 
-            if($requestType == "editDevice") {
+            if ($requestType == "editDevice") {
                 return $this->editDevicePage($deviceUuid, $request);
-            }
-            else if ($requestType == "addSensor") {
+            } else if ($requestType == "addSensor") {
                 return $this->toAddSensor($deviceUuid, $request);
             }
             if ($requestType == "saveSensorProperty") {
                 $deviceSensorEditFormCycle = $this->getDeviceSensorEditFormCycleSessionObject($request);
-                //$deviceSensorEditFormCycle->getSensors()
+                $soil = $request->input("soilValue");
+                $operator = $request->input("operator");
+                $aggregationLogic = $request->input("aggregation_logic");
+                $deviceSensorProperty = new DeviceSensorProperty($soil, $operator, $aggregationLogic);
+
+                $deviceSensorEditFormCycle->getEditingSensor()->getProps()->add($deviceSensorProperty);
                 return "X";
+            }
+            if ($requestType == "removeSensor") {
+
             }
         }
 
@@ -91,7 +99,8 @@ class DeviceController extends Controller
             ->with("device", $device);
     }
 
-    public function getNewSensor(int $newId, string $deviceUuid): Sensor {
+    public function getNewSensor(int $newId, string $deviceUuid): Sensor
+    {
         $newSensor = new Sensor();
         $newSensor->id = $newId;
         $newSensor->type = Types::SENSOR_TYPES()[1]->getUnit();
@@ -135,7 +144,8 @@ class DeviceController extends Controller
         return view("layouts.device.edit")
             ->with("sensorKeyAndTypes", Types::SENSOR_KEY_AND_TYPES())
             ->with("sensorTypes", Types::SENSOR_TYPES())
-            ->with("deviceSensorEditFormCycle", $deviceSensorEditFormCycle);
+            ->with("deviceSensorEditFormCycle", $deviceSensorEditFormCycle)
+            ->with("operators", Operators::OPERATORS());
     }
 
     /**
@@ -153,23 +163,23 @@ class DeviceController extends Controller
      * @param Request $request
      * @return View
      */
-    private function toAddSensor(mixed $deviceUuid, Request $request): string|View
+    private function toAddSensor(mixed $deviceUuid, Request $request): View
     {
         $sensors = $this->getSensorsWhereDeviceUuidEquals($deviceUuid);
         $deviceSensorEditFormCycle = $this->getDeviceSensorEditFormCycleSessionObject($request);
 
-        foreach ($sensors as $sensor) $deviceSensorEditFormCycle->getSensors()[] = $sensor;
+        foreach ($sensors as $sensor)
+            $deviceSensorEditFormCycle->addSensor(DeviceSensorEditForm::fromSensorModel($sensor, false));
 
-        $nextSensorId = $this->getNextSensorId($deviceUuid);
-        $newSensor = $this->getNewSensor($nextSensorId, $deviceUuid);
+        if (!$deviceSensorEditFormCycle->isEditingActive()) {
+            $nextSensorId = $this->getNextSensorId($deviceUuid);
+            $newSensor = $this->getNewSensor($nextSensorId, $deviceUuid);
 
-
-        $deviceSensorEditFormCycle->addSensor(DeviceSensorEditForm::fromSensorModel($newSensor));
-        $deviceSensorEditFormCycle->setEditingSensor(DeviceSensorEditForm::fromSensorModel($newSensor));
+            $deviceSensorEditFormCycle->setEditingSensor(DeviceSensorEditForm::fromSensorModel($newSensor, true));
+        }
 
         return $this->editView($deviceSensorEditFormCycle)
-            ->with("device", $this->getDeviceWhereUuidEquals($deviceUuid))
-            ->with("operators", Operators::OPERATORS());
+            ->with("device", $this->getDeviceWhereUuidEquals($deviceUuid));
     }
 
 }

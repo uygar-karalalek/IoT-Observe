@@ -11,8 +11,10 @@
     <button type="submit" name="request_type" value="saveSensor">Ok</button>
 </td>
 <td>
-    <button type="submit" name="request_type" value="addSensorProperty"> +</button>
+    <button type="submit"
+            name="request_type" value="addSensorProperty"
+    {{$deviceSensorEditFormCycle->isEditingActive() ? "disabled" : ""}}> +</button>
 </td>
 <td>
-    <button type="submit" name="request_type" value="resetSensor"> x</button>
+    <button type="submit" name="request_type" value="removeSensor"> x</button>
 </td>

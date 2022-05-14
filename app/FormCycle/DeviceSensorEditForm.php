@@ -18,22 +18,27 @@ class DeviceSensorEditForm
 
     private string $device_uuid;
 
+    private bool $toSave;
+
     /**
-     * @var DeviceSensorPropertiesEditForm[]
+     * @var DeviceSensorPropertiesEditForm
      */
-    private array $props = [];
+    private DeviceSensorPropertiesEditForm $props;
 
     /**
      * DeviceSensorEditForm constructor.
      * @param int $sensorId
      * @param string $type
      * @param string $device_uuid
+     * @param bool $toSave
      */
-    public function __construct(int $sensorId, string $type, string $device_uuid)
+    public function __construct(int $sensorId, string $type, string $device_uuid, bool $toSave = false)
     {
         $this->id = $sensorId;
         $this->type = $type;
         $this->device_uuid = $device_uuid;
+        $this->props = new DeviceSensorPropertiesEditForm();
+        $this->toSave = $toSave;
     }
 
     /**
@@ -45,6 +50,30 @@ class DeviceSensorEditForm
     }
 
     /**
+     * @return string
+     */
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDeviceUuid(): string
+    {
+        return $this->device_uuid;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isToSave(): bool
+    {
+        return $this->toSave;
+    }
+
+    /**
      * @param int $id
      */
     public function setId(int $id): void
@@ -53,23 +82,23 @@ class DeviceSensorEditForm
     }
 
     /**
-     * @return DeviceSensorPropertiesEditForm[]
+     * @return DeviceSensorPropertiesEditForm
      */
-    public function getProps(): array
+    public function getProps(): DeviceSensorPropertiesEditForm
     {
         return $this->props;
     }
 
     /**
-     * @param DeviceSensorPropertiesEditForm[] $props
+     * @param DeviceSensorPropertiesEditForm $props
      */
-    public function setProps(array $props): void
+    public function setProps(DeviceSensorPropertiesEditForm $props): void
     {
         $this->props = $props;
     }
 
-    public static function fromSensorModel(Sensor $sensor): DeviceSensorEditForm {
-        return new DeviceSensorEditForm($sensor->id, $sensor->type, $sensor->device_uuid);
+    public static function fromSensorModel(Sensor $sensor, bool $toSave): DeviceSensorEditForm {
+        return new DeviceSensorEditForm($sensor->id, $sensor->type, $sensor->device_uuid, $toSave);
     }
 
 }
