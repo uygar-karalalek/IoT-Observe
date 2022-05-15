@@ -228,9 +228,9 @@ class DeviceController extends Controller
 
         $deviceSensorProperty = new DeviceSensorProperty($sensorId, $soilId, $soil, $operator, $aggregationLogic);
         $deviceSensorProperty->persist(update: true);
-        return $deviceSensorProperty->getAggregationLogic();
 
-        $deviceSensorEditFormCycle->getEditingSensor()->getProps()->add($deviceSensorProperty);
+        $deviceSensorEditFormCycle->getSensors()[$sensorId]->getProps()->getProperties()[$deviceSensorProperty->getId()]->copyFrom($deviceSensorProperty);
+
         return $this->editView($deviceSensorEditFormCycle)
             ->with("device", $this->getDeviceWhereUuidEquals($deviceUuid));
     }

@@ -8,15 +8,15 @@
         <td><input type="radio" name="aggregation_logic{{$prop->getId()}}" value="And"> And</td>
     </tr>
     <tr>
-        <td class="sensor_type">{{$sensorTypes[0]->getUnit()}}</td>
+        <td class="sensor_type">{{$sensor->getType()}}</td>
         <td>
             <select name="operator">
                 @foreach($operators as $operator)
-                    <option value="{{$operator}}">{{$operator}}</option>
+                    <option value="{{$operator}}" {{$operator == $prop->getOperator() ? "selected" : ""}}>{{$operator}}</option>
                 @endforeach
             </select>
         </td>
-        <td><input type="number" style="max-width: 100pt" name="soil_value"></td>
+        <td><input type="number" style="max-width: 100pt" name="soil_value" value="{{$prop->getSoilValue()}}"></td>
         <td>
             <button type="submit" name="request_type" value="saveSensorProperty">✔</button>
         </td>

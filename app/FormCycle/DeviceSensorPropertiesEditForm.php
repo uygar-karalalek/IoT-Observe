@@ -13,7 +13,7 @@ class DeviceSensorPropertiesEditForm
     private array $properties = [];
 
     public function add(DeviceSensorProperty $deviceSensorProperty) {
-        $this->properties[] = $deviceSensorProperty;
+        $this->properties[$deviceSensorProperty->getId()] = $deviceSensorProperty;
     }
 
     /**

@@ -4,10 +4,8 @@
 namespace App\FormCycle;
 
 
-use App\Models\Sensor;
 use App\Models\SensorSoil;
 use App\Utils\DbUtils;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use stdClass;
 
@@ -111,6 +109,12 @@ class DeviceSensorProperty
             $sensorSoil->soil_value,
             $sensorSoil->operator, $sensorSoil->aggregation_logic
         );
+    }
+
+    public function copyFrom(DeviceSensorProperty $deviceSensorProperty) {
+        $this->setAggregationLogic($deviceSensorProperty->getAggregationLogic());
+        $this->setOperator($deviceSensorProperty->getOperator());
+        $this->setSoilValue($deviceSensorProperty->getSoilValue());
     }
 
     public function persist(bool $update = false)
