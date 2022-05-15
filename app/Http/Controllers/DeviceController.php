@@ -59,6 +59,8 @@ class DeviceController extends Controller
                     return $this->toAddSensorProperty($request, $deviceUuid);
                 case "removeSensor":
                     return $this->toRemoveSensor($request, $deviceUuid);
+                case "deleteSensorProperty":
+                    return $this->deleteSensorProperty($deviceUuid, $request);
             }
         }
 
@@ -269,6 +271,19 @@ class DeviceController extends Controller
 
         $deviceSensorEditFormCycle->removeSensorByIdFromDb($sensorId);
         $deviceSensorEditFormCycle->deleteSensor($sensorId);
+
+        return $this->editView($deviceSensorEditFormCycle)
+            ->with("device", $this->getDeviceWhereUuidEquals($deviceUuid));
+    }
+
+    private function deleteSensorProperty(mixed $deviceUuid, Request $request)
+    {
+        $deviceSensorEditFormCycle = $this->getDeviceSensorEditFormCycleSessionObject($request);
+        $sensorId = $request->input("sensor_id");
+
+        $soilId = $request->input("soil_id");
+        $deviceSensorEditFormCycle->getSensors()[$sensorId]->removeProperty($soilId);
+        DB::table("sensor_soil")->where("id", "=", $soilId)->delete();
 
         return $this->editView($deviceSensorEditFormCycle)
             ->with("device", $this->getDeviceWhereUuidEquals($deviceUuid));

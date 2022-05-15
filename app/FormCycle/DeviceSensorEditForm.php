@@ -94,7 +94,14 @@ class DeviceSensorEditForm
         $this->props = $props;
     }
 
-    public static function fromSensorModel(Sensor $sensor): DeviceSensorEditForm {
+
+    public function removeProperty($propId)
+    {
+        $this->getProps()->remove($propId);
+    }
+
+    public static function fromSensorModel(Sensor $sensor): DeviceSensorEditForm
+    {
         return new DeviceSensorEditForm($sensor->id, $sensor->type, $sensor->device_uuid);
     }
 

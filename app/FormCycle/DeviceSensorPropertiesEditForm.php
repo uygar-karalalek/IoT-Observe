@@ -16,7 +16,11 @@ class DeviceSensorPropertiesEditForm
         $this->properties[$deviceSensorProperty->getId()] = $deviceSensorProperty;
     }
 
-    /**
+    public function remove($id) {
+        unset($this->properties[$id]);
+    }
+
+     /**
      * @return array
      */
     public function getProperties(): array
