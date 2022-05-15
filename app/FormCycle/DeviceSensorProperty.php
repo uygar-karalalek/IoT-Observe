@@ -4,9 +4,18 @@
 namespace App\FormCycle;
 
 
+use App\Models\Sensor;
+use App\Models\SensorSoil;
+use App\Utils\DbUtils;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use stdClass;
+
 class DeviceSensorProperty
 {
 
+    private int $id;
+    private int $sensorId;
     private float $soilValue;
     private string $operator;
     private string $aggregation_logic;
@@ -17,13 +26,25 @@ class DeviceSensorProperty
      * @param string $operator
      * @param string $aggregation_logic
      */
-    public function __construct(float $soilValue, string $operator, string $aggregation_logic)
+    public function __construct(int $sensorId, $soilId = -1,
+                                float $soilValue = 0.0,
+                                string $operator = ">",
+                                string $aggregation_logic = "and")
     {
+        $this->sensorId = $sensorId;
+        $this->id = $soilId > 0 ? $soilId : (1 + DbUtils::getMaxId("sensor_soil", "sensor_id", $sensorId));
         $this->soilValue = $soilValue;
         $this->operator = $operator;
         $this->aggregation_logic = $aggregation_logic;
     }
 
+    /**
+     * @return int|mixed
+     */
+    public function getId(): mixed
+    {
+        return $this->id;
+    }
 
     /**
      * @return float
@@ -73,5 +94,43 @@ class DeviceSensorProperty
         $this->aggregation_logic = $aggregation_logic;
     }
 
+    /**
+     * @return int
+     */
+    public function getSensorId(): int
+    {
+        return $this->sensorId;
+    }
+
+    public static function fromSoilModel(stdClass $sensorSoil): DeviceSensorProperty
+    {
+
+        return new DeviceSensorProperty(
+            $sensorSoil->sensor_id,
+            $sensorSoil->id,
+            $sensorSoil->soil_value,
+            $sensorSoil->operator, $sensorSoil->aggregation_logic
+        );
+    }
+
+    public function persist(bool $update = false)
+    {
+        if ($update) {
+            DB::table("sensor_soil")->where("id", "=", $this->getId())
+                ->update(['operator' => $this->getOperator(),
+                        "soil_value" => $this->getSoilValue(),
+                        "aggregation_logic" => $this->getAggregationLogic()]
+                );
+        } else {
+            $sensorProp = new SensorSoil();
+            $sensorProp->id = $this->getId();
+            $sensorProp->operator = $this->getOperator();
+            $sensorProp->soil_value = $this->getSoilValue();
+            $sensorProp->aggregation_logic = $this->getAggregationLogic();
+            $sensorProp->sensor_id = $this->getSensorId();
+
+            $sensorProp->save();
+        }
+    }
 
 }

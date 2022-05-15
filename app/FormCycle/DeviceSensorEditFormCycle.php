@@ -49,13 +49,13 @@ class DeviceSensorEditFormCycle
     }
 
     public function addSensor(DeviceSensorEditForm $sensorEditForm): void {
-        $this->sensors[] = $sensorEditForm;
+        $this->sensors[$sensorEditForm->getId()] = $sensorEditForm;
     }
 
     /**
-     * @param DeviceSensorEditForm $sensors
+     * @param DeviceSensorEditForm[] $sensors
      */
-    public function setSensors(DeviceSensorEditForm $sensors): void
+    public function setSensors(array $sensors): void
     {
         $this->sensors = $sensors;
     }

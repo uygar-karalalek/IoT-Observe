@@ -19,37 +19,44 @@
     @if ($deviceSensorEditFormCycle->isEditingActive() &&
             $deviceSensorEditFormCycle->getEditingSensor()->getId() == $sensor->getId())
         <form action="#" method="post">
+            @csrf
             <table>
-                @foreach($sensor->getProps() as $prop)
-                    <tr>@include("layouts.device.sensor_prop")</tr>
+                @foreach($sensor->getProps()->getProperties() as $prop)
+                    <tr>
+                        <form action="#" method="post">
+                            @csrf
+                            @include("layouts.device.sensor_prop")
+                        </form>
+                    </tr>
                 @endforeach
 
+                <input type="hidden" name="sensor_id" value="{{$sensor->getId()}}">
                 <input type="hidden" name="device_uuid" value="{{$device->uuid}}">
             </table>
         </form>
     @else
-        <form action="#" method="post">
-            <form action="#" method="post">
-                @csrf
-                <table>
-                    <tr>
-                        <td>Sensor of type: {{$sensor->getType()}}</td>
-                        <td>
-                            <button type="submit"
-                                    name="request_type" value="addSensorProperty"
-                                {{$deviceSensorEditFormCycle->isEditingActive() ? "disabled" : ""}}> +</button>
-                        </td>
-                    </tr>
-                    @foreach($sensor->getProps() as $prop)
-                        <tr>@include("layouts.device.sensor_prop")</tr>
-                    @endforeach
+        <table>
+            <tr>
+                <td>Sensor of type: {{$sensor->getType()}}</td>
+                <td>
+                    <button type="submit"
+                            name="request_type" value="addSensorProperty"
+                        {{$deviceSensorEditFormCycle->isEditingActive() ? "disabled" : ""}}> +
+                    </button>
+                </td>
+            </tr>
 
-                    <input type="hidden" name="device_uuid" value="{{$device->uuid}}">
-                </table>
-            </form>
-        </form>
+            @foreach($sensor->getProps()->getProperties() as $prop)
+                <tr>
+                    <form action="#" method="post">
+                        @csrf
+                        @include("layouts.device.sensor_prop")
+                    </form>
+                </tr>
+            @endforeach
+
+        </table>
     @endif
-
 @endforeach
 <br>
 <script>

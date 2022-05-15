@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\FormCycle\DeviceSensorEditForm;
-use App\FormCycle\DeviceSensorPropertiesEditForm;
 use App\FormCycle\DeviceSensorEditFormCycle;
 use App\FormCycle\DeviceSensorProperty;
 use App\Models\Device;
 use App\Models\Sensor;
+use App\Models\SensorSoil;
 use App\Types\Operators;
 use App\Types\Types;
+use App\Utils\DbUtils;
 use Faker\Core\Uuid;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
@@ -18,7 +19,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -45,8 +45,8 @@ class DeviceController extends Controller
     {
         $deviceUuid = $request->input("device_uuid");
         $requestType = $request->input("request_type");
-        if ($deviceUuid) {
 
+        if ($deviceUuid) {
             if ($requestType == "editDevice") {
                 return $this->editDevicePage($deviceUuid, $request);
             } else if ($requestType == "addSensor") {
@@ -54,16 +54,10 @@ class DeviceController extends Controller
             } else if ($requestType == "saveSensor") {
                 return $this->toSavedSensor($request, $deviceUuid);
             } else if ($requestType == "saveSensorProperty") {
-                $deviceSensorEditFormCycle = $this->getDeviceSensorEditFormCycleSessionObject($request);
-                $soil = $request->input("soilValue");
-                $operator = $request->input("operator");
-                $aggregationLogic = $request->input("aggregation_logic");
-                $deviceSensorProperty = new DeviceSensorProperty($soil, $operator, $aggregationLogic);
-
-                $deviceSensorEditFormCycle->getEditingSensor()->getProps()->add($deviceSensorProperty);
-                return $this->editView($deviceSensorEditFormCycle)
-                    ->with("device", $this->getDeviceWhereUuidEquals($deviceUuid));
-            } else if ($requestType == "removeSensor") {
+                return $this->saveSensorProperty($request, $deviceUuid);
+            } else if ($requestType == "addSensorProperty") {
+                return $this->addSensorProperty($request, $deviceUuid);
+            }  else if ($requestType == "removeSensor") {
 
             }
         }
@@ -81,16 +75,22 @@ class DeviceController extends Controller
      * @param Request $request
      * @return Application|Factory|View
      */
-    private function editDevicePage(mixed $deviceUuid, Request $request): Application|Factory|View
+    private function editDevicePage(mixed $deviceUuid, Request $request): string|Application|Factory|View
     {
         $deviceSensorEditFormCycle = $this->getDeviceSensorEditFormCycleSessionObject($request);
 
         if (!$deviceSensorEditFormCycle)
             $deviceSensorEditFormCycle = new DeviceSensorEditFormCycle();
 
+        $deviceSensorEditFormCycle->setSensors([]);
+
         $sensors = $this->getSensorsWhereDeviceUuidEquals($deviceUuid);
-        foreach ($sensors as $sensor)
-            $deviceSensorEditFormCycle->addSensor(DeviceSensorEditForm::fromSensorModel($sensor));
+        foreach ($sensors as $sensor) {
+            $sensorEditForm = DeviceSensorEditForm::fromSensorModel($sensor);
+            $props = DB::table("sensor_soil")->where("sensor_id", "=", $sensorEditForm->getId())->get();
+            foreach ($props as $prop) $sensorEditForm->getProps()->add(DeviceSensorProperty::fromSoilModel($prop));
+            $deviceSensorEditFormCycle->addSensor($sensorEditForm);
+        }
 
         $device = $this->getDeviceWhereUuidEquals($deviceUuid);
 
@@ -168,7 +168,7 @@ class DeviceController extends Controller
      */
     private function getNextSensorId(mixed $deviceUuid): int
     {
-        $max = DB::table("sensor")->select()->where("device_uuid", "=", $deviceUuid)->max("id");
+        $max = DbUtils::getMaxId("sensor", "device_uuid", $deviceUuid);
         return 1 + ($max ?? 0);
     }
 
@@ -179,11 +179,7 @@ class DeviceController extends Controller
      */
     private function toAddSensor(mixed $deviceUuid, Request $request): View
     {
-        $sensors = $this->getSensorsWhereDeviceUuidEquals($deviceUuid);
         $deviceSensorEditFormCycle = $this->getDeviceSensorEditFormCycleSessionObject($request);
-
-        foreach ($sensors as $sensor)
-            $deviceSensorEditFormCycle->addSensor(DeviceSensorEditForm::fromSensorModel($sensor));
 
         if (!$deviceSensorEditFormCycle->isEditingActive()) {
             $nextSensorId = $this->getNextSensorId($deviceUuid);
@@ -203,7 +199,7 @@ class DeviceController extends Controller
      * @param mixed $deviceUuid
      * @return View
      */
-    private function toSavedSensor(Request $request, mixed $deviceUuid): string|View
+    private function toSavedSensor(Request $request, mixed $deviceUuid): View
     {
         $deviceSensorEditFormCycle = $this->getDeviceSensorEditFormCycleSessionObject($request);
 
@@ -212,6 +208,42 @@ class DeviceController extends Controller
         $sensor->save();
 
         $deviceSensorEditFormCycle->setEditingSensor(null);
+
+        return $this->editView($deviceSensorEditFormCycle)->with("device", $this->getDeviceWhereUuidEquals($deviceUuid));
+    }
+
+    /**
+     * @param Request $request
+     * @param mixed $deviceUuid
+     * @return View
+     */
+    private function saveSensorProperty(Request $request, mixed $deviceUuid): mixed
+    {
+        $deviceSensorEditFormCycle = $this->getDeviceSensorEditFormCycleSessionObject($request);
+        $soil = $request->input("soil_value");
+        $soilId = $request->input("soil_id");
+        $operator = $request->input("operator");
+        $aggregationLogic = $request->input("aggregation_logic".$soilId);
+        $sensorId = $request->input("sensor_id");
+
+        $deviceSensorProperty = new DeviceSensorProperty($sensorId, $soilId, $soil, $operator, $aggregationLogic);
+        $deviceSensorProperty->persist(update: true);
+        return $deviceSensorProperty->getAggregationLogic();
+
+        $deviceSensorEditFormCycle->getEditingSensor()->getProps()->add($deviceSensorProperty);
+        return $this->editView($deviceSensorEditFormCycle)
+            ->with("device", $this->getDeviceWhereUuidEquals($deviceUuid));
+    }
+
+    private function addSensorProperty(Request $request, mixed $deviceUuid): string|View
+    {
+        $deviceSensorEditFormCycle = $this->getDeviceSensorEditFormCycleSessionObject($request);
+        $sensorId = $request->input("sensor_id");
+
+        $deviceSensorProperty = new DeviceSensorProperty($sensorId);
+        $deviceSensorProperty->persist();
+
+        $deviceSensorEditFormCycle->getSensors()[$sensorId]->getProps()->add($deviceSensorProperty);
 
         return $this->editView($deviceSensorEditFormCycle)->with("device", $this->getDeviceWhereUuidEquals($deviceUuid));
     }
