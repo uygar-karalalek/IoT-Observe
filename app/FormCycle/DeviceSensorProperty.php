@@ -30,7 +30,7 @@ class DeviceSensorProperty
                                 string $aggregation_logic = "and")
     {
         $this->sensorId = $sensorId;
-        $this->id = $soilId > 0 ? $soilId : (1 + DbUtils::getMaxId("sensor_soil", "sensor_id", $sensorId));
+        $this->id = $soilId > 0 ? $soilId : (1 + DbUtils::getMaxId("sensor_soil"));
         $this->soilValue = $soilValue;
         $this->operator = $operator;
         $this->aggregation_logic = $aggregation_logic;
@@ -107,7 +107,8 @@ class DeviceSensorProperty
             $sensorSoil->sensor_id,
             $sensorSoil->id,
             $sensorSoil->soil_value,
-            $sensorSoil->operator, $sensorSoil->aggregation_logic
+            $sensorSoil->operator,
+            $sensorSoil->aggregation_logic
         );
     }
 

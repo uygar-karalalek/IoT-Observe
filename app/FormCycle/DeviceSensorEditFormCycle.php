@@ -3,6 +3,8 @@
 
 namespace App\FormCycle;
 
+use Illuminate\Support\Facades\DB;
+
 class DeviceSensorEditFormCycle
 {
 
@@ -62,6 +64,20 @@ class DeviceSensorEditFormCycle
 
     public function isEditingActive(): bool {
         return $this->editingSensor != null;
+    }
+
+    public function removeSensorByIdFromDb(mixed $sensorId)
+    {
+        $soils = $this->getSensors()[$sensorId]->getProps()->getProperties();
+        foreach ($soils as $value) {
+            DB::table("sensor_soil")->where("id", "=", $value->getId())->delete();
+        }
+        DB::table("sensor")->where("id", "=", $sensorId)->delete();
+    }
+
+    public function deleteSensor(mixed $sensorId)
+    {
+        unset($this->sensors[$sensorId]);
     }
 
 }

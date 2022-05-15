@@ -63,6 +63,14 @@ class DeviceSensorEditForm
     }
 
     /**
+     * @param string $type
+     */
+    public function setType(string $type): void
+    {
+        $this->type = $type;
+    }
+
+    /**
      * @param int $id
      */
     public function setId(int $id): void

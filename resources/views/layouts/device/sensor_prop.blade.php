@@ -1,11 +1,8 @@
 <table>
     <tbody>
     <tr>
-        <td>Add soil</td>
-    </tr>
-    <tr>
-        <td><input type="radio" name="aggregation_logic{{$prop->getId()}}" checked value="Or"> Or </td>
-        <td><input type="radio" name="aggregation_logic{{$prop->getId()}}" value="And"> And</td>
+        <td><input type="radio" name="aggregation_logic{{$prop->getId()}}" {{strcmp($prop->getAggregationLogic(), "or") == 0 ? "checked" : ""}} value="or"> Or </td>
+        <td><input type="radio" name="aggregation_logic{{$prop->getId()}}" {{strcmp($prop->getAggregationLogic(), "and") == 0 ? "checked" : ""}} value="and"> And</td>
     </tr>
     <tr>
         <td class="sensor_type">{{$sensor->getType()}}</td>
