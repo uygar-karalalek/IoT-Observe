@@ -34,6 +34,7 @@ class DeviceController extends Controller
         $device->type = $type;
         $device->setCreatedAt(now());
         $device->setUpdatedAt(now());
+        $device->setUpdatedAt(now());
         $device->user_id = Auth::user()->id;
         $device->save();
 
@@ -53,6 +54,10 @@ class DeviceController extends Controller
                     return $this->toAddSensor($deviceUuid, $request);
                 case "saveSensor":
                     return $this->toSavedSensor($request, $deviceUuid);
+                case "editSensor":
+                    return $this->toEditSensor($request, $deviceUuid);
+                case "unEditSensor":
+                    return $this->toUnEditSensor($request, $deviceUuid);
                 case "saveSensorProperty":
                     return $this->toSaveSensorProperty($request, $deviceUuid);
                 case "addSensorProperty":
@@ -168,10 +173,9 @@ class DeviceController extends Controller
     }
 
     /**
-     * @param mixed $deviceUuid
      * @return int
      */
-    private function getNextSensorId(mixed $deviceUuid): int
+    private function getNextSensorId(): int
     {
         $max = DbUtils::getMaxId("sensor");
         return 1 + ($max ?? 0);
@@ -186,12 +190,12 @@ class DeviceController extends Controller
     {
         $deviceSensorEditFormCycle = $this->getDeviceSensorEditFormCycleSessionObject($request);
 
-        if (!$deviceSensorEditFormCycle->isEditingActive()) {
-            $nextSensorId = $this->getNextSensorId($deviceUuid);
+        if (!$deviceSensorEditFormCycle->isAddingSensor()) {
+            $nextSensorId = $this->getNextSensorId();
             $newSensor = $this->getNewSensor($nextSensorId, $deviceUuid);
             $editingSensor = DeviceSensorEditForm::fromSensorModel($newSensor);
 
-            $deviceSensorEditFormCycle->setEditingSensor($editingSensor);
+            $deviceSensorEditFormCycle->setAddingSensor($editingSensor);
             $deviceSensorEditFormCycle->addSensor($editingSensor);
         }
 
@@ -210,13 +214,20 @@ class DeviceController extends Controller
 
         $sensorType = $request->input("sensor_type");
         $sensorId = $request->input("sensor_id");
-        $sensor = $this->getNewSensor($this->getNextSensorId($deviceUuid), $deviceUuid, $sensorType);
+        $sensor = $this->getNewSensor($this->getNextSensorId(), $deviceUuid, $sensorType);
         $sensor->save();
 
         $deviceSensorEditFormCycle->getSensors()[$sensorId]->setType($sensorType);
 
-        $deviceSensorEditFormCycle->setEditingSensor(null);
+        $deviceSensorEditFormCycle->setAddingSensor(null);
 
+        return $this->editView($deviceSensorEditFormCycle)->with("device", $this->getDeviceWhereUuidEquals($deviceUuid));
+    }
+
+    private function toUnEditSensor(Request$request, mixed$deviceUuid): View {
+        $deviceSensorEditFormCycle = $this->getDeviceSensorEditFormCycleSessionObject($request);
+        $sensorId = $request->input("sensor_id");
+        $deviceSensorEditFormCycle->getSensors()[$sensorId]->setEditing(false);
         return $this->editView($deviceSensorEditFormCycle)->with("device", $this->getDeviceWhereUuidEquals($deviceUuid));
     }
 
@@ -244,7 +255,14 @@ class DeviceController extends Controller
             ->with("device", $this->getDeviceWhereUuidEquals($deviceUuid));
     }
 
-    private function toAddSensorProperty(Request $request, mixed $deviceUuid): string|View
+    private function toEditSensor(Request $request, mixed $deviceUuid): string|View {
+        $deviceSensorEditFormCycle = $this->getDeviceSensorEditFormCycleSessionObject($request);
+        $sensorId = $request->input("sensor_id");
+        $deviceSensorEditFormCycle->getSensors()[$sensorId]->setEditing(true);
+        return $this->editView($deviceSensorEditFormCycle)->with("device", $this->getDeviceWhereUuidEquals($deviceUuid));
+    }
+
+    private function toAddSensorProperty(Request $request, mixed $deviceUuid): View
     {
         $deviceSensorEditFormCycle = $this->getDeviceSensorEditFormCycleSessionObject($request);
         $sensorId = $request->input("sensor_id");
@@ -262,12 +280,12 @@ class DeviceController extends Controller
      * @param mixed $deviceUuid
      * @return View
      */
-    private function toRemoveSensor(Request $request, mixed $deviceUuid): string|View
+    private function toRemoveSensor(Request $request, mixed $deviceUuid): View
     {
         $deviceSensorEditFormCycle = $this->getDeviceSensorEditFormCycleSessionObject($request);
         $sensorId = $request->input("sensor_id");
-        if ($deviceSensorEditFormCycle->isEditingActive() && $deviceSensorEditFormCycle->getEditingSensor()->getId() == $sensorId)
-            $deviceSensorEditFormCycle->setEditingSensor(null);
+        if ($deviceSensorEditFormCycle->isAddingSensor() && $deviceSensorEditFormCycle->getAddingSensor()->getId() == $sensorId)
+            $deviceSensorEditFormCycle->setAddingSensor(null);
 
         $deviceSensorEditFormCycle->removeSensorByIdFromDb($sensorId);
         $deviceSensorEditFormCycle->deleteSensor($sensorId);

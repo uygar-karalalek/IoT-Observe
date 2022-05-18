@@ -19,6 +19,8 @@ class DeviceSensorEditForm
 
     private string $device_uuid;
 
+    private bool $editing = false;
+
     /**
      * @var DeviceSensorPropertiesEditForm
      */
@@ -103,6 +105,22 @@ class DeviceSensorEditForm
     public static function fromSensorModel(Sensor $sensor): DeviceSensorEditForm
     {
         return new DeviceSensorEditForm($sensor->id, $sensor->type, $sensor->device_uuid);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEditing(): bool
+    {
+        return $this->editing;
+    }
+
+    /**
+     * @param bool $editing
+     */
+    public function setEditing(bool $editing): void
+    {
+        $this->editing = $editing;
     }
 
 }

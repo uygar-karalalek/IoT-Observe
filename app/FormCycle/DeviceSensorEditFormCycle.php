@@ -11,7 +11,7 @@ class DeviceSensorEditFormCycle
     /**
      * @var DeviceSensorEditForm|null
      */
-    private ?DeviceSensorEditForm $editingSensor;
+    private ?DeviceSensorEditForm $addingSensor;
 
     /**
      * @var DeviceSensorEditForm[]
@@ -23,23 +23,23 @@ class DeviceSensorEditFormCycle
      */
     public function __construct()
     {
-        $this->editingSensor = null;
+        $this->addingSensor = null;
      }
 
     /**
-     * @return DeviceSensorEditForm
+     * @return DeviceSensorEditForm|null
      */
-    public function getEditingSensor(): DeviceSensorEditForm
+    public function getAddingSensor(): ?DeviceSensorEditForm
     {
-        return $this->editingSensor;
+        return $this->addingSensor;
     }
 
     /**
-     * @param DeviceSensorEditForm|null $editingSensor
+     * @param DeviceSensorEditForm|null $addingSensor
      */
-    public function setEditingSensor(?DeviceSensorEditForm $editingSensor): void
+    public function setAddingSensor(?DeviceSensorEditForm $addingSensor): void
     {
-        $this->editingSensor = $editingSensor;
+        $this->addingSensor = $addingSensor;
     }
 
     /**
@@ -63,8 +63,8 @@ class DeviceSensorEditFormCycle
         $this->sensors = $sensors;
     }
 
-    public function isEditingActive(): bool {
-        return $this->editingSensor != null;
+    public function isAddingSensor(): bool {
+        return $this->addingSensor != null;
     }
 
     public function removeSensorByIdFromDb(mixed $sensorId)
