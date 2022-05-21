@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Device;
+use App\Models\MessageModel;
 use App\Types\Types;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use stdClass;
 
 class HomeController extends Controller

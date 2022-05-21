@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\IndexController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\ProcessorController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -31,6 +33,9 @@ Route::get("/userId", function () {
 
     return -1;
 });
+Route::post("/process/{deviceId}/sensors", [ProcessorController::class, "process"]);
+Route::get("/user/{userId}/messages", [MessageController::class, "getMessagesOnUserId"]);
+Route::get("/user/{userId}/messages/delete", [MessageController::class, "deleteMessagesOnUserId"]);
 Route::post("/clientDevices/toProcess", [DeviceController::class, "clientDevicesToProcess"]);
 Route::get('/', [IndexController::class, "index"]);
 Route::get('/device', [DeviceController::class, "getAllDevices"]);
