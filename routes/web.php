@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\IndexController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -30,6 +31,7 @@ Route::get("/userId", function () {
 
     return -1;
 });
+Route::post("/clientDevices/toProcess", [DeviceController::class, "clientDevicesToProcess"]);
 Route::get('/', [IndexController::class, "index"]);
 Route::get('/device', [DeviceController::class, "getAllDevices"]);
 Route::post('/devices/create', [DeviceController::class, "addDevice"]);

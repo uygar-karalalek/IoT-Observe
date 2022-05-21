@@ -13,7 +13,8 @@
                                 <tr>
                                     <td>Device name{{ __(": ") }}</td>
                                     <td>
-                                        <input type="text" name="deviceName">
+                                        <select id="deviceName" onchange="fillDeviceType()" name="deviceName">
+                                        </select>
                                     </td>
                                 </tr>
                                 <tr style="height: 50px" class="device-type-row">
@@ -21,19 +22,53 @@
                                         Device type:
                                     </td>
                                     <td>
-                                        <select name="deviceType">
-                                            <option value="Phone">Phone</option>
-                                            <option value="Arduino">Arduino</option>
-                                            <option value="PC">PC</option>
-                                        </select>
+                                        <input type="text" name="deviceType" id="devType" readonly/>
                                     </td>
                                 </tr>
                                 <tr class="create-device-row">
                                     <td>
-                                        <input type="submit" value="Create">
+                                        <input id="createDevice" type="submit" value="Create">
                                     </td>
                                 </tr>
                             </table>
+                            <script>
+                                let devices = null;
+
+                                function fillDeviceType() {
+                                    let deviceName = document.getElementById("deviceName").value;
+                                    devices.forEach(device => {
+                                        if (device.name === deviceName) {
+                                            document.getElementById("devType").value = device.type
+
+                                        }
+                                    })
+                                }
+
+                                axios.get("http://localhost:8081/api/fetchAllDevices/{{\Illuminate\Support\Facades\Auth::user()->id}}?secret=THIS_IS_A_SECRET", {
+                                    headers: {
+                                        'Access-Control-Allow-Origin': '*',
+                                        'Content-Type': 'application/json',
+                                        'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+                                    }
+                                }).then(value => {
+                                    devices = value.data;
+                                    axios.post("http://127.0.0.1:8000/clientDevices/toProcess", devices, {
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        }
+                                    }).then(filteredDevices => {
+                                        console.log(filteredDevices.data.length)
+                                        if (filteredDevices.data.length === 0) {
+                                            document.getElementById("createDevice").disabled = true;
+                                        } else {
+                                            filteredDevices.data.forEach(device => {
+                                                document.getElementById("deviceName").innerHTML += "<option value='" + device.name + "'>" + device.name + "</option>"
+                                            })
+                                            fillDeviceType()
+                                        }
+                                    })
+                                })
+                            </script>
                         </form>
                     </div>
                 </div>

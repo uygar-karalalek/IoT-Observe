@@ -77,6 +77,24 @@ class DeviceController extends Controller
         return Device::all();
     }
 
+    public function clientDevicesToProcess(Request $request)
+    {
+        $devicesExclude = Device::query()->where("user_id", "=", Auth::user()->getAuthIdentifier())->get()->all();
+        $devicesToFilter = $request->all();
+        $filtered = [];
+        foreach ($devicesToFilter as $device) {
+            $existsInDb = false;
+            foreach ($devicesExclude as $dbDevice) {
+                if ($dbDevice["name"] == $device["name"]) {
+                    $existsInDb = true;
+                    break;
+                }
+            }
+            if (!$existsInDb) $filtered[] = $device;
+        }
+        return $filtered;
+    }
+
     /**
      * @param mixed $deviceUuid
      * @param Request $request
@@ -224,7 +242,8 @@ class DeviceController extends Controller
         return $this->editView($deviceSensorEditFormCycle)->with("device", $this->getDeviceWhereUuidEquals($deviceUuid));
     }
 
-    private function toUnEditSensor(Request$request, mixed$deviceUuid): View {
+    private function toUnEditSensor(Request $request, mixed $deviceUuid): View
+    {
         $deviceSensorEditFormCycle = $this->getDeviceSensorEditFormCycleSessionObject($request);
         $sensorId = $request->input("sensor_id");
         $deviceSensorEditFormCycle->getSensors()[$sensorId]->setEditing(false);
@@ -242,7 +261,7 @@ class DeviceController extends Controller
         $soil = $request->input("soil_value");
         $soilId = $request->input("soil_id");
         $operator = $request->input("operator");
-        $aggregationLogic = $request->input("aggregation_logic".$soilId);
+        $aggregationLogic = $request->input("aggregation_logic" . $soilId);
         $sensorId = $request->input("sensor_id");
 
         $deviceSensorProperty = new DeviceSensorProperty($sensorId, $soilId, $soil, $operator, $aggregationLogic);
@@ -255,7 +274,8 @@ class DeviceController extends Controller
             ->with("device", $this->getDeviceWhereUuidEquals($deviceUuid));
     }
 
-    private function toEditSensor(Request $request, mixed $deviceUuid): string|View {
+    private function toEditSensor(Request $request, mixed $deviceUuid): string|View
+    {
         $deviceSensorEditFormCycle = $this->getDeviceSensorEditFormCycleSessionObject($request);
         $sensorId = $request->input("sensor_id");
         $deviceSensorEditFormCycle->getSensors()[$sensorId]->setEditing(true);
