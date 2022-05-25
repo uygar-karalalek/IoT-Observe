@@ -10,7 +10,7 @@ use App\Models\Builder\SensorBuilder;
 class AddSensorPageBuilder extends EditPageBuilder
 {
 
-    public function buildView(mixed $deviceUuid)
+    public function buildSensorPageView(mixed $deviceUuid)
     {
         $deviceSensorEditFormCycle = $this->request->session()->get("deviceSensorEditFormCycle");
 

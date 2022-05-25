@@ -8,7 +8,7 @@ use App\Models\Builder\SensorBuilder;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 
-class RedirectToSaveSensorPageBuilder extends EditPageBuilder
+class SaveSensorPageBuilder extends EditPageBuilder
 {
 
     private function build(Request $request, mixed $deviceUuid): View
