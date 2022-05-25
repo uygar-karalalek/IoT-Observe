@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Repository;
+namespace App\UseCase;
 
 
 use App\FormCycle\DeviceSensorEditFormCycle;
@@ -14,7 +14,7 @@ use Illuminate\Contracts\View\View;
 class EditViewBuilderUseCase
 {
 
-    private function editView(DeviceSensorEditFormCycle $deviceSensorEditFormCycle): Application|Factory|View {
+    public function editView(DeviceSensorEditFormCycle $deviceSensorEditFormCycle): Application|Factory|View {
         return view("layouts.device.edit")
             ->with("sensorKeyAndTypes", Types::SENSOR_KEY_AND_TYPES())
             ->with("sensorTypes", Types::SENSOR_TYPES())

@@ -15,7 +15,7 @@ class SensorRepository
         return 1 + ($max ?? 0);
     }
 
-    public function getSensorsWhereDeviceUuidEquals(string $deviceUuid)
+    public function getSensorsWhereDeviceUuidEquals(string $deviceUuid): array
     {
         $collection = DB::table("sensor")->where("device_uuid", "=", $deviceUuid)->get();
         $mappedSensors = [];
