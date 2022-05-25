@@ -7,7 +7,6 @@ namespace App\UseCase;
 use App\Repository\DeviceRepository;
 use App\Repository\SensorRepository;
 use Illuminate\Http\Request;
-use function MongoDB\Driver\Monitoring\removeSubscriber;
 
 class RequestViewDispatcher
 {
@@ -19,14 +18,14 @@ class RequestViewDispatcher
 
     /**
      * RequestDeviceEditUseCase constructor.
-     * @param Request $request
      * @param SensorRepository $sensorRepository
      * @param DeviceRepository $deviceRepository
      * @param EditViewBuilderUseCase $editViewBuilderUseCase
      */
-    public function __construct(Request $request, SensorRepository $sensorRepository, DeviceRepository $deviceRepository, EditViewBuilderUseCase $editViewBuilderUseCase)
+    public function __construct(SensorRepository $sensorRepository,
+                                DeviceRepository $deviceRepository,
+                                EditViewBuilderUseCase $editViewBuilderUseCase)
     {
-        $this->request = $request;
         $this->sensorRepository = $sensorRepository;
         $this->deviceRepository = $deviceRepository;
         $this->editViewBuilderUseCase = $editViewBuilderUseCase;
@@ -39,10 +38,7 @@ class RequestViewDispatcher
 
         if ($deviceUuid) {
             switch ($requestType) {
-                case "editDevice":
-                    $formObject = $request->session()->get("deviceSensorEditFormCycle");
-                    return (new EditViewBuilderUseCase())->editView($formObject);
-
+                case "editDevice":return $this->getBasePageView($request, $deviceUuid);
                 case "addSensor": return $this->addSensorView($request, $deviceUuid);
                 case "saveSensor": return $this->saveSensorView($request, $deviceUuid);
                 case "editSensor": return $this->getEditSensorView($request, $deviceUuid);
@@ -133,6 +129,16 @@ class RequestViewDispatcher
     private function getDeleteSensorPropertyView(Request $request, mixed $deviceUuid): \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
     {
         return (new DeleteSensorPropertyPageBuilder($request, $this->sensorRepository, $this->deviceRepository, $this->editViewBuilderUseCase))->deleteSensorProperty($deviceUuid);
+    }
+
+    /**
+     * @param Request $request
+     * @param mixed $deviceUuid
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     */
+    private function getBasePageView(Request $request, mixed $deviceUuid): \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory
+    {
+        return (new BaseEditPageBuilder($request, $this->sensorRepository, $this->deviceRepository, $this->editViewBuilderUseCase))->apply($deviceUuid);
     }
 
 }

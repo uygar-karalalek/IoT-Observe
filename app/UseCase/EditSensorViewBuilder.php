@@ -1,12 +1,8 @@
 <?php
 
-
 namespace App\UseCase;
 
-
-use Illuminate\Http\Request;
-
-class EditSensorViewBuilder extends BaseEditPageBuilder
+class EditSensorViewBuilder extends EditPageBuilder
 {
 
     public function getView(int $deviceUuid)
@@ -17,4 +13,5 @@ class EditSensorViewBuilder extends BaseEditPageBuilder
         return $this->editViewBuilderUseCase->editView($deviceSensorEditFormCycle)->
                 with("device", $this->deviceRepository->getDeviceWhereUuidEquals($deviceUuid));
     }
+
 }

@@ -7,7 +7,6 @@ namespace App\Http\Controllers;
 use App\Models\MessageModel;
 use App\Utils\Processor;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class ProcessorController
 {
