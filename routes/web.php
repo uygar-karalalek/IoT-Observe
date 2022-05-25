@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Route;
 Auth::routes();
 
 Route::get("/userId", function () {
+
     $email = request("username");
     $data = request("password");
     $user = DB::table("users")->where("email", "=", $email)->get()->first();

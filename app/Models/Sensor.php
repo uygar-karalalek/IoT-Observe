@@ -9,4 +9,5 @@ class Sensor extends Model
 {
     use HasFactory;
     protected $table = "sensor";
+
 }
