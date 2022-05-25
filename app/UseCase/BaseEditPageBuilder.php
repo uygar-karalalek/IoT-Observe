@@ -12,31 +12,8 @@ use App\Repository\SensorRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class RedirectToEditPageUseCase
+class BaseEditPageBuilder extends EditPageBuilder
 {
-
-    private Request $request;
-    private SensorRepository $sensorRepository;
-    private DeviceRepository $deviceRepository;
-    private EditViewBuilderUseCase $editViewBuilderUseCase;
-
-    /**
-     * RedirectToEditPageUseCase constructor.
-     * @param Request $request
-     * @param EditViewBuilderUseCase $editViewBuilderUseCase
-     * @param SensorRepository $sensorRepository
-     * @param DeviceRepository $deviceRepository
-     */
-    public function __construct(Request $request,
-                                EditViewBuilderUseCase $editViewBuilderUseCase,
-                                SensorRepository $sensorRepository,
-                                DeviceRepository $deviceRepository)
-    {
-        $this->request = $request;
-        $this->sensorRepository = $sensorRepository;
-        $this->deviceRepository = $deviceRepository;
-        $this->editViewBuilderUseCase = $editViewBuilderUseCase;
-    }
 
     public function apply(string $deviceUuid)
     {
