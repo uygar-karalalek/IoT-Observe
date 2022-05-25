@@ -47,6 +47,7 @@ class DeviceController extends Controller
         $deviceUuid = $request->input("device_uuid");
         $requestType = $request->input("request_type");
 
+
         if ($deviceUuid) {
             switch ($requestType) {
                 case "editDevice":

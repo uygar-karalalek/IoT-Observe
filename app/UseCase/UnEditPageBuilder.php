@@ -10,10 +10,10 @@ use Illuminate\Http\Request;
 class UnEditPageBuilder extends EditPageBuilder
 {
 
-    public function toUnEditSensor(Request $request, mixed $deviceUuid): View
+    public function toUnEditSensor(mixed $deviceUuid): View
     {
-        $deviceSensorEditFormCycle = $request->session()->get("deviceSensorEditFormCycle");
-        $sensorId = $request->input("sensor_id");
+        $deviceSensorEditFormCycle = $this->request->session()->get("deviceSensorEditFormCycle");
+        $sensorId = $this->request->input("sensor_id");
         $deviceSensorEditFormCycle->getSensors()[$sensorId]->setEditing(false);
         return $this->editViewBuilderUseCase->editView($deviceSensorEditFormCycle)
             ->with("device", $this->deviceRepository->getDeviceWhereUuidEquals($deviceUuid));

@@ -11,10 +11,10 @@ use Illuminate\Http\Request;
 class AddSensorPropertyPageBuilder extends EditPageBuilder
 {
 
-    private function toAddSensorProperty(Request $request, mixed $deviceUuid): View
+    public function toAddSensorProperty(mixed $deviceUuid): View
     {
-        $deviceSensorEditFormCycle = $request->session()->get("deviceSensorEditFormCycle");
-        $sensorId = $request->input("sensor_id");
+        $deviceSensorEditFormCycle = $this->request->session()->get("deviceSensorEditFormCycle");
+        $sensorId = $this->request->input("sensor_id");
 
         $deviceSensorProperty = new DeviceSensorProperty($sensorId);
         $deviceSensorProperty->persist();

@@ -4,18 +4,17 @@
 namespace App\UseCase;
 
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DeleteSensorPropertyPageBuilder extends EditPageBuilder
 {
 
-    public function deleteSensorProperty(mixed $deviceUuid, Request $request)
+    public function deleteSensorProperty(mixed $deviceUuid)
     {
-        $deviceSensorEditFormCycle = $request->session()->get("deviceSensorEditFormCycle");
-        $sensorId = $request->input("sensor_id");
+        $deviceSensorEditFormCycle = $this->request->session()->get("deviceSensorEditFormCycle");
+        $sensorId = $this->request->input("sensor_id");
 
-        $soilId = $request->input("soil_id");
+        $soilId = $this->request->input("soil_id");
         $deviceSensorEditFormCycle->getSensors()[$sensorId]->removeProperty($soilId);
         DB::table("sensor_soil")->where("id", "=", $soilId)->delete();
 

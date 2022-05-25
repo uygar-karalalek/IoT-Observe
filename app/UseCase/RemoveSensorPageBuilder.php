@@ -5,15 +5,14 @@ namespace App\UseCase;
 
 
 use Illuminate\Contracts\View\View;
-use Illuminate\Http\Request;
 
 class RemoveSensorPageBuilder extends EditPageBuilder
 {
 
-    private function toRemoveSensor(Request $request, mixed $deviceUuid): View
+    public function toRemoveSensor(mixed $deviceUuid): View
     {
-        $deviceSensorEditFormCycle = $request->session()->get("deviceSensorEditFormCycle");
-        $sensorId = $request->input("sensor_id");
+        $deviceSensorEditFormCycle = $this->request->session()->get("deviceSensorEditFormCycle");
+        $sensorId = $this->request->input("sensor_id");
         if ($deviceSensorEditFormCycle->isAddingSensor() && $deviceSensorEditFormCycle->getAddingSensor()->getId() == $sensorId)
             $deviceSensorEditFormCycle->setAddingSensor(null);
 
