@@ -5,7 +5,7 @@ namespace App\UseCase;
 class EditSensorViewBuilder extends EditPageBuilder
 {
 
-    public function getView(int $deviceUuid)
+    public function getView(string $deviceUuid): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Contracts\Foundation\Application
     {
         $deviceSensorEditFormCycle = $this->request->session()->get("deviceSensorEditFormCycle");
         $sensorId = $this->request->input("sensor_id");

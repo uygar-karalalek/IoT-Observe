@@ -11,7 +11,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 
-class EditViewBuilderUseCase
+class EditViewBuilder
 {
 
     public function editView(DeviceSensorEditFormCycle $deviceSensorEditFormCycle): Application|Factory|View {

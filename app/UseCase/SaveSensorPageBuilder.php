@@ -15,8 +15,8 @@ class SaveSensorPageBuilder extends EditPageBuilder
     {
         $deviceSensorEditFormCycle = $this->request->session()->get("deviceSensorEditFormCycle");
 
-        $sensorType = $request->input("sensor_type");
-        $sensorId = $request->input("sensor_id");
+        $sensorType = $this->request->input("sensor_type");
+        $sensorId = $this->request->input("sensor_id");
         $sensor = (new SensorBuilder())
                     ->withId($this->sensorRepository->getNextSensorId())
                     ->withDeviceUuid($deviceUuid)->withType($sensorType)

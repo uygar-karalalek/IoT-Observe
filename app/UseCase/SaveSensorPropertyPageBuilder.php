@@ -5,20 +5,22 @@ namespace App\UseCase;
 
 
 use App\FormCycle\DeviceSensorProperty;
-use Illuminate\Http\Request;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 
 class SaveSensorPropertyPageBuilder extends EditPageBuilder
 {
 
-    public function toSaveSensorProperty(Request $request, mixed $deviceUuid): mixed
+    public function toSaveSensorProperty(mixed $deviceUuid): Application|Factory|View
     {
-        $deviceSensorEditFormCycle = $request->session()->get("deviceSensorEditFormCycle");
+        $deviceSensorEditFormCycle = $this->request->session()->get("deviceSensorEditFormCycle");
 
-        $soil = $request->input("soil_value");
-        $soilId = $request->input("soil_id");
-        $operator = $request->input("operator");
-        $aggregationLogic = $request->input("aggregation_logic" . $soilId);
-        $sensorId = $request->input("sensor_id");
+        $soil = $this->request->input("soil_value");
+        $soilId = $this->request->input("soil_id");
+        $operator = $this->request->input("operator");
+        $aggregationLogic = $this->request->input("aggregation_logic" . $soilId);
+        $sensorId = $this->request->input("sensor_id");
 
         $deviceSensorProperty = new DeviceSensorProperty($sensorId, $soilId, $soil, $operator, $aggregationLogic);
         $deviceSensorProperty->persist(update: true);

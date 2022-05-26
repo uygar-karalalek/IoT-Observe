@@ -4,6 +4,7 @@
 namespace App\Repository;
 
 
+use App\Models\Sensor;
 use App\Utils\DbUtils;
 use Illuminate\Support\Facades\DB;
 

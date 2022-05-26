@@ -15,3 +15,6 @@ mix.js('resources/js/app.js', 'public/js')
     .sass('resources/sass/app.scss', 'public/css', [])
     .css('resources/css/style.css', 'public/css')
     .sourceMaps();
+
+mix.js('resources/js/messages_react.js', 'public/js')
+    .sourceMaps();

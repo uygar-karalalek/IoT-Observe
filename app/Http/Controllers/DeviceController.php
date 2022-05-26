@@ -2,29 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\FormCycle\DeviceSensorEditForm;
-use App\FormCycle\DeviceSensorEditFormCycle;
-use App\FormCycle\DeviceSensorProperty;
 use App\Models\Device;
-use App\Models\Sensor;
 use App\Repository\DeviceRepository;
 use App\Repository\SensorRepository;
-use App\Types\Operators;
-use App\Types\Types;
-use App\UseCase\EditViewBuilderUseCase;
+use App\UseCase\EditViewBuilder;
 use App\UseCase\RequestViewDispatcher;
-use App\Utils\DbUtils;
 use Faker\Core\Uuid;
 use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class DeviceController extends Controller
 {
@@ -49,8 +37,26 @@ class DeviceController extends Controller
     public function editDevice(Request $request)
     {
         $requestViewDispatcher = new RequestViewDispatcher(new SensorRepository(),
-            new DeviceRepository(), new EditViewBuilderUseCase());
+            new DeviceRepository(), new EditViewBuilder());
         return $requestViewDispatcher->apply($request);
+    }
+
+    public function clientDevicesToProcess(Request $request)
+    {
+        $devicesExclude = Device::query()->where("user_id", "=", Auth::user()->getAuthIdentifier())->get()->all();
+        $devicesToFilter = $request->all();
+        $filtered = [];
+        foreach ($devicesToFilter as $device) {
+            $existsInDb = false;
+            foreach ($devicesExclude as $dbDevice) {
+                if ($dbDevice["name"] == $device["name"]) {
+                    $existsInDb = true;
+                    break;
+                }
+            }
+            if (!$existsInDb) $filtered[] = $device;
+        }
+        return $filtered;
     }
 
 }

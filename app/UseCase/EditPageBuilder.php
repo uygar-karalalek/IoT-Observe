@@ -14,16 +14,17 @@ abstract class EditPageBuilder
     protected Request $request;
     protected SensorRepository $sensorRepository;
     protected DeviceRepository $deviceRepository;
-    protected EditViewBuilderUseCase $editViewBuilderUseCase;
+    protected EditViewBuilder $editViewBuilderUseCase;
 
     /**
      * EditPageBuilder constructor.
      * @param Request $request
      * @param SensorRepository $sensorRepository
      * @param DeviceRepository $deviceRepository
-     * @param EditViewBuilderUseCase $editViewBuilderUseCase
+     * @param EditViewBuilder $editViewBuilderUseCase
      */
-    public function __construct(Request $request, SensorRepository $sensorRepository, DeviceRepository $deviceRepository, EditViewBuilderUseCase $editViewBuilderUseCase)
+    public function __construct(Request $request, SensorRepository $sensorRepository,
+                                DeviceRepository $deviceRepository, EditViewBuilder $editViewBuilderUseCase)
     {
         $this->request = $request;
         $this->sensorRepository = $sensorRepository;

@@ -1,11 +1,12 @@
 <?php
 
-
 namespace App\UseCase;
-
 
 use App\Repository\DeviceRepository;
 use App\Repository\SensorRepository;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 
 class RequestViewDispatcher
@@ -14,24 +15,24 @@ class RequestViewDispatcher
     protected Request $request;
     protected SensorRepository $sensorRepository;
     protected DeviceRepository $deviceRepository;
-    protected EditViewBuilderUseCase $editViewBuilderUseCase;
+    protected EditViewBuilder $editViewBuilderUseCase;
 
     /**
      * RequestDeviceEditUseCase constructor.
      * @param SensorRepository $sensorRepository
      * @param DeviceRepository $deviceRepository
-     * @param EditViewBuilderUseCase $editViewBuilderUseCase
+     * @param EditViewBuilder $editViewBuilderUseCase
      */
     public function __construct(SensorRepository $sensorRepository,
                                 DeviceRepository $deviceRepository,
-                                EditViewBuilderUseCase $editViewBuilderUseCase)
+                                EditViewBuilder $editViewBuilderUseCase)
     {
         $this->sensorRepository = $sensorRepository;
         $this->deviceRepository = $deviceRepository;
         $this->editViewBuilderUseCase = $editViewBuilderUseCase;
     }
 
-    public function apply(Request $request)
+    public function apply(Request $request): Factory|View|Application|null
     {
         $deviceUuid = $request->input("device_uuid");
         $requestType = $request->input("request_type");
@@ -42,10 +43,10 @@ class RequestViewDispatcher
                 case "addSensor": return $this->addSensorView($request, $deviceUuid);
                 case "saveSensor": return $this->saveSensorView($request, $deviceUuid);
                 case "editSensor": return $this->getEditSensorView($request, $deviceUuid);
-                case "unEditSensor": return $this->getToUnEditSensorView($request);
-                case "saveSensorProperty": return $this->getSaveSensorPageView($request, $deviceUuid);
-                case "addSensorProperty": return $this->getAddSensorPropertyView($request);
-                case "removeSensor": return $this->getToRemoveSensorView($request);
+                case "unEditSensor": return $this->getToUnEditSensorView($request, $deviceUuid);
+                case "saveSensorProperty": return $this->getSaveSensorPropertyPageView($request, $deviceUuid);
+                case "addSensorProperty": return $this->getAddSensorPropertyView($request, $deviceUuid);
+                case "removeSensor": return $this->getToRemoveSensorView($request, $deviceUuid);
                 case "deleteSensorProperty": return $this->getDeleteSensorPropertyView($request, $deviceUuid);
             }
         }
@@ -56,9 +57,9 @@ class RequestViewDispatcher
     /**
      * @param Request $request
      * @param mixed $deviceUuid
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @return Application|Factory|View
      */
-    private function addSensorView(Request $request, mixed $deviceUuid): \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+    private function addSensorView(Request $request, mixed $deviceUuid): Application|Factory|View
     {
         return (new AddSensorPageBuilder($request, $this->sensorRepository, $this->deviceRepository, $this->editViewBuilderUseCase))->buildSensorPageView($deviceUuid);
     }
@@ -66,67 +67,70 @@ class RequestViewDispatcher
     /**
      * @param Request $request
      * @param mixed $deviceUuid
-     * @return \Illuminate\Contracts\View\View
+     * @return View
      */
-    private function saveSensorView(Request $request, mixed $deviceUuid): \Illuminate\Contracts\View\View
+    private function saveSensorView(Request $request, mixed $deviceUuid): View
     {
-        return (new SaveSensorPageBuilder($request, $this->sensorRepository, $this->deviceRepository, $this->editViewBuilderUseCase))->getView($request, $deviceUuid);
+        return (new SaveSensorPageBuilder($request, $this->sensorRepository, $this->deviceRepository, $this->editViewBuilderUseCase))->getView($deviceUuid);
     }
 
     /**
      * @param Request $request
      * @param mixed $deviceUuid
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @return Application|Factory|View
      */
-    private function getEditSensorView(Request $request, mixed $deviceUuid): \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+    private function getEditSensorView(Request $request, mixed $deviceUuid): Application|Factory|View
     {
         return (new EditSensorViewBuilder($request, $this->sensorRepository, $this->deviceRepository, $this->editViewBuilderUseCase))->getView($deviceUuid);
     }
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\View\View
+     * @param string $deviceUuid
+     * @return View
      */
-    private function getToUnEditSensorView(Request $request): \Illuminate\Contracts\View\View
+    private function getToUnEditSensorView(Request $request, string $deviceUuid): View
     {
-        return (new UnEditPageBuilder($request, $this->sensorRepository, $this->deviceRepository, $this->editViewBuilderUseCase))->toUnEditSensor();
+        return (new UnEditPageBuilder($request, $this->sensorRepository, $this->deviceRepository, $this->editViewBuilderUseCase))->toUnEditSensor($deviceUuid);
     }
 
     /**
      * @param Request $request
      * @param mixed $deviceUuid
-     * @return \Illuminate\Contracts\View\View
+     * @return View
      */
-    private function getSaveSensorPageView(Request $request, mixed $deviceUuid): \Illuminate\Contracts\View\View
+    private function getSaveSensorPropertyPageView(Request $request, mixed $deviceUuid): View
     {
-        return (new SaveSensorPageBuilder($request, $this->sensorRepository, $this->deviceRepository, $this->editViewBuilderUseCase))
-            ->getView($deviceUuid);
-    }
-
-    /**
-     * @param Request $request
-     * @return mixed
-     */
-    private function getAddSensorPropertyView(Request $request)
-    {
-        return (new AddSensorPropertyPageBuilder($request, $this->sensorRepository, $this->deviceRepository, $this->editViewBuilderUseCase))->toAddSensorProperty($this->deviceRepository);
-    }
-
-    /**
-     * @param Request $request
-     * @return \Illuminate\Contracts\View\View
-     */
-    private function getToRemoveSensorView(Request $request): \Illuminate\Contracts\View\View
-    {
-        return (new RemoveSensorPageBuilder($request, $this->sensorRepository, $this->deviceRepository, $this->editViewBuilderUseCase))->toRemoveSensor($this->deviceRepository);
+        return (new SaveSensorPropertyPageBuilder($request, $this->sensorRepository, $this->deviceRepository, $this->editViewBuilderUseCase))
+            ->toSaveSensorProperty($deviceUuid);
     }
 
     /**
      * @param Request $request
      * @param mixed $deviceUuid
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @return View
      */
-    private function getDeleteSensorPropertyView(Request $request, mixed $deviceUuid): \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+    private function getAddSensorPropertyView(Request $request, mixed $deviceUuid): View
+    {
+        return (new AddSensorPropertyPageBuilder($request, $this->sensorRepository, $this->deviceRepository, $this->editViewBuilderUseCase))->toAddSensorProperty($deviceUuid);
+    }
+
+    /**
+     * @param Request $request
+     * @param mixed $deviceUuid
+     * @return View
+     */
+    private function getToRemoveSensorView(Request $request, mixed $deviceUuid): View
+    {
+        return (new RemoveSensorPageBuilder($request, $this->sensorRepository, $this->deviceRepository, $this->editViewBuilderUseCase))->toRemoveSensor($deviceUuid);
+    }
+
+    /**
+     * @param Request $request
+     * @param mixed $deviceUuid
+     * @return Application|Factory|View
+     */
+    private function getDeleteSensorPropertyView(Request $request, mixed $deviceUuid): Application|Factory|View
     {
         return (new DeleteSensorPropertyPageBuilder($request, $this->sensorRepository, $this->deviceRepository, $this->editViewBuilderUseCase))->deleteSensorProperty($deviceUuid);
     }
@@ -134,9 +138,9 @@ class RequestViewDispatcher
     /**
      * @param Request $request
      * @param mixed $deviceUuid
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @return Application|Factory|View
      */
-    private function getBasePageView(Request $request, mixed $deviceUuid): \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory
+    private function getBasePageView(Request $request, mixed $deviceUuid): Application|View|Factory
     {
         return (new BaseEditPageBuilder($request, $this->sensorRepository, $this->deviceRepository, $this->editViewBuilderUseCase))->apply($deviceUuid);
     }

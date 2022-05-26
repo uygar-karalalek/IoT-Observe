@@ -1,0 +1,2 @@
+(()=>{var e=null;setInterval((function(){axios.get("http://127.0.0.1:8000/user/"+window.deviceUserId+"/messages").then((function(n){var t=n.data,l=null==e?t.length:t.length-e.length;if(null==e||0!==l){e=t;for(var r=t.length-l;r<t.length;r++)document.getElementById("body").innerHTML+=t[r].content+"<br>"}}))}),2e3)})();
+//# sourceMappingURL=messages_react.js.map
