@@ -1,6 +1,6 @@
 <td>Sensor type:</td>
 <td>
-    <select id="sensor_type" name="sensor_type" onchange="changeTheUnit(this)">
+    <select id="sensor_type" name="sensor_type">
     </select>
     @include("script.device_sensor_props_action_react")
 </td>

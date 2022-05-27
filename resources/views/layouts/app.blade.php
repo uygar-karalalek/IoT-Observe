@@ -20,6 +20,14 @@
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <style>
+        #app {
+            background-color: #7a7abd;
+            height: 150vh;
+        }
+    </style>
+
 </head>
 <body>
     <div id="app">

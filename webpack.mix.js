@@ -18,3 +18,5 @@ mix.js('resources/js/app.js', 'public/js')
 
 mix.js('resources/js/messages_react.js', 'public/js')
     .sourceMaps();
+
+mix.copy("resources/images", "public/images")

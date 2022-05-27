@@ -66,13 +66,4 @@
     @endif
 @endforeach
 <br>
-<script>
-    function changeTheUnit(selected) {
-        let arr = {!! json_encode($sensorKeyAndTypes) !!};
-        let sensorTypes = document.getElementsByClassName("sensor_type");
-        for (let i = 0; i < sensorTypes.length; i++) {
-            sensorTypes[i].innerHTML = arr[selected.value].unit;
-        }
-    }
-</script>
 <br>

@@ -40,6 +40,7 @@ class RequestViewDispatcher
         if ($deviceUuid) {
             switch ($requestType) {
                 case "editDevice":return $this->getBasePageView($request, $deviceUuid);
+                case "removeDevice":return $this->getRemovePageView($request, $deviceUuid);
                 case "addSensor": return $this->addSensorView($request, $deviceUuid);
                 case "saveSensor": return $this->saveSensorView($request, $deviceUuid);
                 case "editSensor": return $this->getEditSensorView($request, $deviceUuid);
@@ -143,6 +144,16 @@ class RequestViewDispatcher
     private function getBasePageView(Request $request, mixed $deviceUuid): Application|View|Factory
     {
         return (new BaseEditPageBuilder($request, $this->sensorRepository, $this->deviceRepository, $this->editViewBuilderUseCase))->apply($deviceUuid);
+    }
+
+    /**
+     * @param Request $request
+     * @param mixed $deviceUuid
+     * @return Application|Factory|View
+     */
+    private function getRemovePageView(Request $request, mixed $deviceUuid): Application|View|Factory
+    {
+        return (new RemovePageBuilder($request, $this->sensorRepository, $this->deviceRepository, $this->editViewBuilderUseCase))->apply($deviceUuid);
     }
 
 }

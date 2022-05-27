@@ -6,7 +6,8 @@
             if (previous == null || previous.length !== data.length) {
                 previous = data;
                 data.forEach(element => {
-                    document.getElementById("sensor_type").innerHTML += "<option name='" + element["type"] + "' value='" + element["type"] + "'>" + element["type"] + "</option>";
+                    if(document.getElementById("idOptType" + element["type"]) == null)
+                        document.getElementById("sensor_type").innerHTML += "<option id='idOptType"+element["type"]+"' name='" + element["type"] + "' value='" + element["type"] + "'>" + element["type"] + "</option>";
                 })
             }
         })

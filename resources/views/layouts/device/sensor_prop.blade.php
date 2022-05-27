@@ -5,7 +5,7 @@
         <td><input type="radio" name="aggregation_logic{{$prop->getId()}}" {{strcmp($prop->getAggregationLogic(), "and") == 0 ? "checked" : ""}} value="and"> And</td>
     </tr>
     <tr>
-        <td class="sensor_type">{{$sensor->getType()}}</td>
+        <td class="sensor_type">{{$sensor->getType()}} ({{$sensorKeyAndTypes[$sensor->getType()]->getUnit()}})</td>
         <td>
             <select name="operator">
                 @foreach($operators as $operator)

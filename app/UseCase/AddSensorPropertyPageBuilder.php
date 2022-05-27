@@ -17,6 +17,7 @@ class AddSensorPropertyPageBuilder extends EditPageBuilder
         $sensorId = $this->request->input("sensor_id");
 
         $deviceSensorProperty = new DeviceSensorProperty($sensorId);
+        $deviceSensorProperty->setOperator("<");
         $deviceSensorProperty->persist();
 
         $deviceSensorEditFormCycle->getSensors()[$sensorId]->getProps()->add($deviceSensorProperty);

@@ -19,6 +19,15 @@
                 'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
             }
         }).then(value => {
+            Array.from(document.getElementsByClassName("text-device-connection")).forEach(option => {
+                let present = false;
+                value.data.forEach(device => {
+                    if (option.getAttribute("id").includes("text" + device.name)) present = true;
+                });
+                if (present) option.innerHTML = "<span style='color: #7bba3b;'><u>Status: Connected</u></span>";
+                else option.innerHTML = "<span style='color: #e7a1a1'><u>Status: Not connected</u></span>";
+            });
+
             if (devices == null || value.data.length !== devices.length) {
                 document.getElementById("deviceName").innerHTML = "";
                 devices = value.data;
@@ -32,7 +41,8 @@
                     } else {
                         document.getElementById("createDevice").disabled = false;
                         filteredDevices.data.forEach(device => {
-                            document.getElementById("deviceName").innerHTML += "<option value='" + device.name + "'>" + device.name + "</option>"
+                            if (document.getElementById("option" + device.name) == null)
+                                document.getElementById("deviceName").innerHTML += "<option id='option" + device.name + "' value='" + device.name + "'>" + device.name + "</option>"
                         })
                         fillDeviceType()
                     }

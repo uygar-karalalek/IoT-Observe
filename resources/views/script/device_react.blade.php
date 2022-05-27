@@ -10,7 +10,6 @@
             })
             .then(sensors => {
                     let httpData = sensors.data;
-                    console.log(httpData)
                     axios.post("http://127.0.0.1:8000/process/{{isset($i) ? $devices[$i]->uuid : $device->uuid}}/sensors", httpData, {
                         headers: {
                             'Access-Control-Allow-Origin': '*',
